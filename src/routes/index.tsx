@@ -39,7 +39,7 @@ function FeedbackPage() {
               className="size-20 object-contain"
             />
             <h1 className="mt-4 text-2xl font-semibold text-foreground">Customer Feedback</h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">Your experience matters to us.</p>
+            <p className="mt-1.5 text-sm text-muted-foreground">Your feedback matters to us.</p>
           </header>
 
           {submitted ? (
