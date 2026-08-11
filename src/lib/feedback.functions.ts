@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { useSession } from "@tanstack/react-start/server";
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 
 import type { Database } from "@/integrations/supabase/types";
@@ -39,10 +39,27 @@ const feedbackSchema = z.object({
 export const submitFeedback = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => feedbackSchema.parse(data))
   .handler(async ({ data }) => {
-    // Uses the server-side admin client to reliably write to Supabase
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createClient } = await import("@supabase/supabase-js");
 
-    const { error } = await supabaseAdmin.from("feedback").insert({
+    const supabaseUrl =
+      process.env["SUPABASE_URL"] ||
+      process.env["VITE_SUPABASE_URL"] ||
+      "https://jbmgjknafbqvbjxiwtlo.supabase.co";
+
+    const supabaseKey =
+      process.env["SUPABASE_SERVICE_ROLE_KEY"] ||
+      process.env["SUPABASE_PUBLISHABLE_KEY"] ||
+      process.env["VITE_SUPABASE_ANON_KEY"] ||
+      process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||
+      "";
+
+    const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    // explicitly generate id to prevent null-constraint issues in database
+    const { error } = await supabase.from("feedback").insert({
+      id: randomUUID(),
       overall_rating: data.overall_rating,
       service_rating: data.service_rating,
       written_feedback: data.written_feedback ? data.written_feedback : null,
@@ -50,8 +67,9 @@ export const submitFeedback = createServerFn({ method: "POST" })
 
     if (error) {
       console.error("feedback insert failed:", error.message);
-      throw new Error("We couldn't save your feedback. Please try again.");
+      throw new Error(`We couldn't save your feedback (${error.message}).`);
     }
+
     return { ok: true as const };
   });
 
@@ -76,8 +94,21 @@ export const getAdminFeedback = createServerFn({ method: "GET" }).handler(async 
   const session = await useSession<AdminSession>(sessionConfig());
   if (!session.data.unlocked) return { locked: true as const };
 
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+  const { createClient } = await import("@supabase/supabase-js");
+  const supabaseUrl =
+    process.env["SUPABASE_URL"] ||
+    process.env["VITE_SUPABASE_URL"] ||
+    "https://jbmgjknafbqvbjxiwtlo.supabase.co";
+
+  const supabaseKey =
+    process.env["SUPABASE_SERVICE_ROLE_KEY"] ||
+    process.env["SUPABASE_PUBLISHABLE_KEY"] ||
+    process.env["VITE_SUPABASE_ANON_KEY"] ||
+    "";
+
+  const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+
+  const { data, error } = await supabase
     .from("feedback")
     .select("id, overall_rating, service_rating, written_feedback, submitted_at")
     .order("submitted_at", { ascending: false });
