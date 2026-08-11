@@ -1,10 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import logoAsset from "@/assets/soltech-logo.png";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { FeedbackSuccess } from "@/components/FeedbackSuccess";
-
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,7 +32,7 @@ function FeedbackPage() {
         <div className="card-elevated overflow-hidden">
           <header className="flex flex-col items-center border-b border-border px-6 pt-8 pb-6 text-center sm:px-8">
             <img
-              src={logoAsset.url}
+              src="/soltech-logo.png"
               alt="Soltech Energy"
               width={512}
               height={512}
