@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, LogOut, Star } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import logoAsset from "@/assets/soltech-logo.png.asset.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -84,7 +83,7 @@ function AdminLogin() {
         className="card-elevated w-full max-w-sm space-y-5 px-7 py-8"
       >
         <div className="flex flex-col items-center text-center">
-          <img src={logoAsset.url} alt="Soltech Energy" width={512} height={512} className="size-11" />
+          <img src="/soltech-logo.png" alt="Soltech Energy" width={512} height={512} className="size-11 object-contain" />
           <h1 className="mt-3 text-xl font-semibold">Feedback Dashboard</h1>
           <p className="mt-1 text-sm text-muted-foreground">Enter the admin password to continue.</p>
         </div>
@@ -156,7 +155,7 @@ function Dashboard({ feedback }: { feedback: FeedbackRow[] }) {
     <main className="mx-auto min-h-screen w-full max-w-5xl px-4 py-8 sm:px-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <img src={logoAsset.url} alt="Soltech Energy" width={512} height={512} className="size-9" />
+          <img src="/soltech-logo.png" alt="Soltech Energy" width={512} height={512} className="size-9 object-contain" />
           <div>
             <h1 className="text-xl font-semibold">Feedback Dashboard</h1>
             <p className="text-sm text-muted-foreground">Soltech Energy customer responses</p>
