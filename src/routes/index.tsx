@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import logoAsset from "@/assets/soltech-logo.png.asset.json";
+import logoAsset from "@/assets/soltech-logo.png";
 import { FeedbackForm } from "@/components/FeedbackForm";
 import { FeedbackSuccess } from "@/components/FeedbackSuccess";
 
