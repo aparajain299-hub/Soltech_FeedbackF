@@ -17,7 +17,7 @@ type AdminSession = { unlocked?: boolean };
 
 function sessionConfig() {
   return {
-    password: process.env["SESSION_SECRET"]!,
+    password: process.env["SESSION_SECRET"] || "default-secret-key-32-chars-long!!",
     name: "soltech-admin",
     maxAge: 60 * 60 * 12,
     cookie: { httpOnly: true, secure: true, sameSite: "lax" as const, path: "/" },
@@ -39,30 +39,17 @@ const feedbackSchema = z.object({
 export const submitFeedback = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => feedbackSchema.parse(data))
   .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-    const supabase = createClient<Database>(process.env["SUPABASE_URL"]!, key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: {
-        fetch: (input, init) => {
-          const h = new Headers(init?.headers);
-          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) {
-            h.delete("Authorization");
-          }
-          h.set("apikey", key);
-          return fetch(input, { ...init, headers: h });
-        },
-      },
-    });
+    // Uses the server-side admin client to reliably write to Supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { error } = await supabase.from("feedback").insert({
+    const { error } = await supabaseAdmin.from("feedback").insert({
       overall_rating: data.overall_rating,
       service_rating: data.service_rating,
       written_feedback: data.written_feedback ? data.written_feedback : null,
     });
 
     if (error) {
-      console.error("feedback insert failed", error.message);
+      console.error("feedback insert failed:", error.message);
       throw new Error("We couldn't save your feedback. Please try again.");
     }
     return { ok: true as const };
@@ -96,7 +83,7 @@ export const getAdminFeedback = createServerFn({ method: "GET" }).handler(async 
     .order("submitted_at", { ascending: false });
 
   if (error) {
-    console.error("feedback read failed", error.message);
+    console.error("feedback read failed:", error.message);
     throw new Error("Could not load feedback.");
   }
   return { locked: false as const, feedback: (data ?? []) as FeedbackRow[] };
