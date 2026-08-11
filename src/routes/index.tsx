@@ -36,7 +36,7 @@ function FeedbackPage() {
               alt="Soltech Energy"
               width={512}
               height={512}
-              className="size-14 object-contain"
+              className="size-20 object-contain"
             />
             <h1 className="mt-4 text-2xl font-semibold text-foreground">Customer Feedback</h1>
             <p className="mt-1.5 text-sm text-muted-foreground">Your experience matters to us.</p>
