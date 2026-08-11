@@ -3,7 +3,7 @@ export function FeedbackSuccess() {
     <div className="flex flex-col items-center px-6 py-16 text-center">
       <div className="flex size-16 items-center justify-center rounded-full bg-accent-soft text-3xl">
         <img
-          src="assets/soltech-logo.png"
+          src="soltech-logo.png"
           alt="Soltech Energy"
           className="size-10 object-contain"
         />
